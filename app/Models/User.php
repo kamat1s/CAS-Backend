@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use PHPUnit\Framework\MockObject\Builder\Stub;
 
 class User extends Authenticatable
 {
@@ -41,4 +42,9 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'userID', 'id');
+    }
 }

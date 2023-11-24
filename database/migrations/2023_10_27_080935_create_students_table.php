@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('studentID')->unique();
             $table->unsignedBigInteger('userID');
             $table->string('name');
-            $table->integer('personalInformationID')->nullable();
+            $table->integer('personalInformationID');
             $table->integer('familyBackgroundID')->nullable();
             $table->integer('physicalHealthInfoID')->nullable();
             $table->integer('careerID')->nullable();
             $table->integer('yearLevel');
-            $table->integer('blockID')->nullable();
+            $table->integer('blockID');
             $table->timestamps();
 
             $table->foreign('userID')->references('id')->on('users');
