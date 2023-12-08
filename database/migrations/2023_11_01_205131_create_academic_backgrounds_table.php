@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('level');
             $table->string('schoolName');
-            $table->string('accomplishments');
-            $table->integer('studentID');
+            $table->string('accomplishments')->nullable();
+            $table->integer('userID');
             $table->timestamps();
         });
     }

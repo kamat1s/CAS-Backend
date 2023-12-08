@@ -17,17 +17,17 @@ class FamilyBackground extends Model
 
     public function father()
     {
-        return $this->belongsTo(Parent::class, 'fatherID');
+        return $this->belongsTo(Guardian::class, 'fatherID');
     }
 
     public function mother()
     {
-        return $this->belongsTo(Parent::class, 'motherID');
+        return $this->belongsTo(Guardian::class, 'motherID');
     }
 
     public function guardian()
     {
-        return $this->belongsTo(Parent::class, 'guardianID');
+        return $this->belongsTo(Guardian::class, 'guardianID');
     }
 
     public function siblings()

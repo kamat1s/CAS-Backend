@@ -15,4 +15,14 @@ class Employee extends Model
         'name',
         'email',
     ];
+
+    public function college()
+    {
+        return $this->belongsTo(College::class, 'collegeID', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userID', 'id');
+    }
 }

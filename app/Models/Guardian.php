@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EmergencyContact extends Model
+class Guardian extends Model
 {
     use HasFactory;
 
@@ -15,8 +15,8 @@ class EmergencyContact extends Model
         'updated_at'
     ];
 
-    public function personalInformation()
+    public function familyBackground()
     {
-        return $this->hasOne(PersonalInformation::class, 'emergencyContactID', 'id');
+        return $this->belongsTo(FamilyBackground::class);
     }
 }

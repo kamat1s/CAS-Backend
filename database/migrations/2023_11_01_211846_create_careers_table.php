@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('secondCourseID');
             $table->integer('thirdCourseID');
             $table->text('factors');
+            $table->string('otherFactors');
             $table->string('futureVision');
             $table->timestamps();
         });

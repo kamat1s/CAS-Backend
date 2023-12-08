@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('fatherID');
             $table->integer('motherID');
             $table->integer('guardianID');
-            $table->string('relationshipStatus');
-            $table->string('livingArrangement');
+            $table->string('relationshipStatus')->nullable();
+            $table->string('livingArrangement')->nullable();
             $table->string('siblingRank');
             $table->timestamps();
         });
