@@ -14,4 +14,19 @@ class Career extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function firstCourse()
+    {
+        return $this->belongsTo(Course::class, 'firstCourseID', 'id');
+    }
+
+    public function secondCourse()
+    {
+        return $this->belongsTo(Course::class, 'secondCourseID', 'id');
+    }
+
+    public function thirdCourse()
+    {
+        return $this->belongsTo(Course::class, 'thirdCourseID', 'id');
+    }
 }

@@ -4,33 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Sibling;
 use App\Models\Student;
+use App\Models\Employee;
 use App\Models\Guardian;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use App\Models\EmergencyContact;
 use App\Models\FamilyBackground;
 use Illuminate\Http\JsonResponse;
+use App\Models\AcademicBackground;
+use App\Models\PhysicalHealthInfo;
 use Illuminate\Support\Facades\DB;
 use App\Models\PersonalInformation;
 use App\Http\Controllers\Controller;
-use App\Models\AcademicBackground;
-use App\Models\Career;
-use App\Models\PhysicalHealthInfo;
 
-class StudentController extends Controller
+class FacultyConroller extends Controller
 {
-
-    public function getStudent(Request $request): JsonResponse
+    public function getFaculty(Request $request): JsonResponse
     {
         $userID = $request->user()->id;
-        $userData = Student::with('user', 'block.course.college', 'personalInformation')
+        $userData = Employee::with('user', 'personalInformation', 'college')
             ->where('userID', $userID)
             ->first();
 
         $response = [
-            'student' => $userData->only(['id', 'studentID', 'name', 'yearLevel']),
+            'faculty' => $userData->only(['id', 'employeeID', 'name']),
             'user' => $userData->user,
-            'college' => $userData->block->course->college->only(['id', 'collegeName', 'collegeAbbreviation', 'assignedCounselorID']),
-            'course' => $userData->block->course->only(['id', 'collegeID', 'courseName', 'courseAbbreviation']),
+            'college' => $userData->college->only(['id', 'collegeName', 'collegeAbbreviation', 'assignedCounselorID']),
             'personalInformation' => $userData->personalInformation,
         ];
 
@@ -41,18 +40,16 @@ class StudentController extends Controller
     {
         $userID = $request->user()->id;
 
-        $userData = Student::with('user', 'personalInformation.emergencyContact', 'familyBackground.father', 'familyBackground.mother', 'familyBackground.guardian', 'familyBackground.siblings', 'physicalHealthInfo', 'career', 'block.course.college', 'academicBackgrounds')
+        $userData = Employee::with('user', 'personalInformation.emergencyContact', 'familyBackground.father', 'familyBackground.mother', 'familyBackground.guardian', 'familyBackground.siblings', 'physicalHealthInfo', 'college', 'academicBackgrounds')
             ->where('userID', $userID)
             ->first();
 
         $response = [
-            'student' => $userData->only(['id', 'studentID', 'name', 'yearLevel']),
+            'faculty' => $userData->only(['id', 'employeeID', 'name']),
             'user' => $userData->user,
             'personalInformation' => $userData->personalInformation,
             'emergencyContact' => $userData->personalInformation->emergencyContact,
-            'block' => $userData->block->only(['id', 'block', 'yearStanding']),
-            'college' => $userData->block->course->college->only(['id', 'collegeName', 'collegeAbbreviation']),
-            'course' => $userData->block->course->only(['id', 'collegeID', 'courseName', 'courseAbbreviation']),
+            'college' => $userData->college->only(['id', 'collegeName', 'collegeAbbreviation']),
             'familyBackground' => $userData->familyBackground ? $userData->familyBackground->only(['id', 'relationshipStatus', 'livingArrangement', 'siblingRank']) : null,
             'father' => $userData->familyBackground ? $userData->familyBackground->father : null,
             'mother' => $userData->familyBackground ? $userData->familyBackground->mother : null,
@@ -60,39 +57,7 @@ class StudentController extends Controller
             'siblings' => $userData->familyBackground ? $userData->familyBackground->siblings : null,
             'physicalHealthInfo' => $userData->physicalHealthInfo ? $userData->physicalHealthInfo : null,
             'academicBackgrounds' => $userData->academicBackgrounds,
-            'career' => $userData->career,
         ];
-
-        return response()->json($response);
-    }
-
-    public function getCPIs(Request $request): JsonResponse
-    {
-        $userData = Student::with('user', 'personalInformation.emergencyContact', 'familyBackground.father', 'familyBackground.mother', 'familyBackground.guardian', 'familyBackground.siblings', 'physicalHealthInfo', 'career', 'block.course.college', 'academicBackgrounds', 'career.firstCourse', 'career.secondCourse', 'career.thirdCourse')
-            ->whereIn('userID', $request->userIDs)
-            ->get();
-
-        $response = [];
-
-        foreach ($userData as $student) {
-            $response[] = [
-                'student' => $student->only(['id', 'studentID', 'name', 'yearLevel']),
-                'user' => $student->user,
-                'personalInformation' => $student->personalInformation,
-                'emergencyContact' => $student->personalInformation->emergencyContact,
-                'block' => $student->block->only(['id', 'block', 'yearStanding']),
-                'college' => $student->block->course->college->only(['id', 'collegeName', 'collegeAbbreviation']),
-                'course' => $student->block->course->only(['id', 'collegeID', 'courseName', 'courseAbbreviation']),
-                'familyBackground' => $student->familyBackground ? $student->familyBackground->only(['id', 'relationshipStatus', 'livingArrangement', 'siblingRank']) : null,
-                'father' => $student->familyBackground ? $student->familyBackground->father : null,
-                'mother' => $student->familyBackground ? $student->familyBackground->mother : null,
-                'guardian' => $student->familyBackground ? $student->familyBackground->guardian : null,
-                'siblings' => $student->familyBackground ? $student->familyBackground->siblings : null,
-                'physicalHealthInfo' => $student->physicalHealthInfo ? $student->physicalHealthInfo : null,
-                'academicBackgrounds' => $student->academicBackgrounds,
-                'career' => $student->career,
-            ];
-        }
 
         return response()->json($response);
     }
@@ -102,7 +67,7 @@ class StudentController extends Controller
         try {
             DB::beginTransaction();
 
-            $student = Student::where('userID', $request->user()->id)->first();
+            $faculty = Employee::where('userID', $request->user()->id)->first();
 
             $personalInformation = PersonalInformation::find($request->personalInformation['id']);
 
@@ -160,7 +125,7 @@ class StudentController extends Controller
                     ]
                 );
 
-                $student->familyBackgroundID = $familyBackground->id;
+                $faculty->familyBackgroundID = $familyBackground->id;
             } else {
                 $familyBackground = FamilyBackground::find($request->familyBackground['id']);
                 if ($familyBackground) {
@@ -213,7 +178,7 @@ class StudentController extends Controller
                     $request->physicalHealthInfo
                 );
 
-                $student->physicalHealthInfoID = $physicalHealthInfo->id;
+                $faculty->physicalHealthInfoID = $physicalHealthInfo->id;
             } else {
                 $physicalHealthInfo = PhysicalHealthInfo::find($request->physicalHealthInfo['id']);
 
@@ -261,34 +226,7 @@ class StudentController extends Controller
                 }
             }
 
-            $career = null;
-
-            if (!array_key_exists('id', $request->career)) {
-                $career = Career::create(
-                    $request->career
-                );
-
-                $student->careerID = $career->id;
-            } else {
-                $career = Career::find($request->career['id']);
-
-                if ($career) {
-                    foreach ([
-                        'firstCourseID',
-                        'secondCourseID',
-                        'thirdCourseID',
-                        'factors',
-                        'otherFactors',
-                        'futureVision'
-                    ] as $attribute) {
-                        $career->{$attribute} = $request->career[$attribute];
-                    }
-
-                    $career->save();
-                }
-            }
-
-            $student->save();
+            $faculty->save();
 
             DB::commit();
 
@@ -306,21 +244,6 @@ class StudentController extends Controller
             ];
             return response()->json($response, 500);
         }
-    }
-
-    public function getCpiStatus(Request $request): JsonResponse
-    {
-        $userID = $request->user()->id;
-
-        $userData = Student::where('userID', $userID)
-            ->first()->only(['familyBackgroundID', 'physicalHealthInfoID', 'careerID']);
-
-
-        return response()->json([
-            'cpiStatus' => $userData['familyBackgroundID'] != null &&
-                $userData['physicalHealthInfoID'] != null
-                && $userData['careerID'] != null
-        ]);
     }
 
     function createOrUpdateGuardian($requestData)
@@ -347,5 +270,47 @@ class StudentController extends Controller
         }
 
         return $guardian;
+    }
+
+    public function getCpiStatus(Request $request): JsonResponse
+    {
+        $userID = $request->user()->id;
+
+        $userData = Employee::where('userID', $userID)
+            ->first()->only(['familyBackgroundID', 'physicalHealthInfoID']);
+
+
+        return response()->json([
+            'cpiStatus' => $userData['familyBackgroundID'] != null &&
+                $userData['physicalHealthInfoID'] != null
+        ]);
+    }
+
+    public function getFacultyStudents(Request $request): JsonResponse
+    {
+        $facultyID = $request->facultyID;
+
+        $facultyStudents = SchoolClass::where('facultyID', $facultyID)
+            ->with('students', 'students.personalInformation', 'students.block.course.college', 'students.user')
+            ->get()
+            ->flatMap(function ($class) {
+                return $class->students->map(function ($student) {
+                    return [
+                        'id' => $student->id,
+                        'studentID' => $student->studentID,
+                        'name' => $student->name,
+                        'collegeName' => $student->block->course->college->collegeName,
+                        'email' => $student->user->email,
+                        'mobileNo' => $student->personalInformation->mobileNo,
+                        'courseAbbreviation' => $student->block->course->courseAbbreviation,
+                        'year' => $student->block->yearStanding,
+                        'block' => $student->block->block,
+                    ];
+                });
+            });
+
+        return response()->json([
+            'students' => $facultyStudents,
+        ]);
     }
 }

@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class, 'userID', 'id');
     }
+
+    public function counselor()
+    {
+        return $this->hasOne(Employee::class, 'userID', 'id');
+    }
 }

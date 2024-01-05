@@ -16,6 +16,9 @@ return new class extends Migration
             $table->integer('userID');
             $table->string('employeeID')->unique();
             $table->string('collegeID')->nullable();
+            $table->integer('personalInformationID')->nullable();
+            $table->integer('familyBackgroundID')->nullable();
+            $table->integer('physicalHealthInfoID')->nullable();
             $table->string('name');
             $table->timestamps();
         });

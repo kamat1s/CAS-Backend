@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('guardianID');
             $table->string('relationshipStatus')->nullable();
             $table->string('livingArrangement')->nullable();
-            $table->string('siblingRank');
+            $table->string('siblingRank')->nullable();
             $table->timestamps();
         });
     }

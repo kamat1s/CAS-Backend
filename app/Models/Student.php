@@ -49,4 +49,9 @@ class Student extends Model
     {
         return $this->hasMany(AcademicBackground::class, 'userID');
     }
+
+    public function schoolClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'blockID', 'blockID');
+    }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('careers', function (Blueprint $table) {
             $table->id();
-            $table->integer('firstCourseID');
-            $table->integer('secondCourseID');
-            $table->integer('thirdCourseID');
-            $table->text('factors');
-            $table->string('otherFactors');
-            $table->string('futureVision');
+            $table->integer('firstCourseID')->nullable();
+            $table->integer('secondCourseID')->nullable();
+            $table->integer('thirdCourseID')->nullable();
+            $table->text('factors')->nullable();
+            $table->string('otherFactors')->nullable();
+            $table->string('futureVision')->nullable();
             $table->timestamps();
         });
     }

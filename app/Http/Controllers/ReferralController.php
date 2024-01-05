@@ -75,4 +75,44 @@ class ReferralController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function getCounselorReferrals(Request $request): JsonResponse
+    {
+        $referrals = Referral::with(['student', 'referrer', 'student.user', 'student.personalInformation', 'referrer.user', 'student.block.course.college'])
+            ->get();
+
+        $counselorID = $request->user()->counselor['id'];
+
+        $counselorAppointments = [];
+
+        foreach ($referrals as $referral) {
+            if ($counselorID == $referral->student->block->course->college->assignedCounselorID) {
+                $counselorAppointments[] = $referral;
+            }
+        }
+
+        return response()->json($counselorAppointments);
+    }
+
+    public function getStudentReferrals(Request $request): JsonResponse
+    {
+        $studentID = $request->user()->student['id'];
+
+        $referrals = Referral::with(['referrer'])
+            ->where('studentID',  $studentID)
+            ->get();
+
+        return response()->json($referrals);
+    }
+
+    public function getFacultyReferrals(Request $request): JsonResponse
+    {
+        $facultyID = $request->user()->faculty['id'];
+
+        $referrals = Referral::with(['student'])
+            ->where('referrerID',  $facultyID)
+            ->get();
+
+        return response()->json($referrals);
+    }
 }
